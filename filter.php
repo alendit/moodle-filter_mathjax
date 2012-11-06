@@ -183,7 +183,7 @@ EOT;
         // and pass to MathJax for processing
         $patterns = array(
             '/\\\\\\(.+?\\\\\\)/s',
-            '/([^\$\\\\]|^)\$[^\$](.+?)([^\$\\\\])\$([^\$]|$)/s',
+            '/([^\$\\\\]|^)\$(([^\$])(.*?)([^\$\\\\])|.)\$([^\$]|$)/s',
             '/\$\$.+?\$\$/s',
             '/\\\\\\[.+?\\\\\\]/s',
             '/<math\s[^>]+.+?<\/math>/s',
@@ -191,7 +191,7 @@ EOT;
         
         $replacements = array(
             $precodeinline.'$0'.$postcodeinline,
-            '$1'.$precodeinline.'\( $2$3$4 \)'.$postcodeinline.'$5',
+            '$1'.$precodeinline.'\( $2 \)'.$postcodeinline.'$6',
             $precodeblock.'$0'.$postcodeblock,
             $precodeblock.'$0'.$postcodeblock,
             $precodeblock.'$0'.$postcodeblock,
