@@ -134,16 +134,6 @@ class filter_mathjax extends moodle_text_filter {
         // elements as appropriate for the Javascript module to collect
         // and pass to MathJax for processing
 
-        $this->patterns = array(
-            
-            '/<math\s[^>]+.+?<\/math>/s',
-        );
-
-        $this->replacements = array(
-            
-            $precodeblock.'$0'.$postcodeblock,
-        );
-
         //   inline: \$...\$        
         if ($CFG->filter_mathjax_singledollar == 1) {
             array_push($this->patterns, '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s');
@@ -165,6 +155,13 @@ class filter_mathjax extends moodle_text_filter {
         //   block: \[ ... \]
         if ($CFG->filter_mathjax_bracket == 1) {
             array_push($this->patterns, '/\\\\\\[.+?\\\\\\]/s');
+            array_push($this->replacements, $precodeblock.'$0'.$postcodeblock);
+        }
+
+        //   block: <math />
+
+        if ($CFG->filter_mathjax_mathtag == 1) {
+            array_push($this->patterns, '/&lt;math(\\s+(?!&gt;).+?&gt;|&gt;).+?&lt;\/math&gt;/s');
             array_push($this->replacements, $precodeblock.'$0'.$postcodeblock);
         }
     }

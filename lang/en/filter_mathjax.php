@@ -14,3 +14,5 @@ $string['doubledollar'] = 'Parse double-dollar';
 $string['doubledollar_descr'] = 'Accept block math in double-dollar delimiters.';
 $string['bracket'] = 'Parse bracket';
 $string['bracket_descr'] = 'Accept block math in escaped bracket delimiters.';
+$string['mathtag'] = 'Parse math element';
+$string['mathtag_descr'] = 'Accept block math in <math /> element.';
