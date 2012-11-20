@@ -12,3 +12,5 @@ $string['parentheses'] = 'Parse escaped parentheses';
 $string['parentheses_descr'] = 'Accept inline math in escaped parentheses ( \(...\) ) delimiters';
 $string['doubledollar'] = 'Parse double-dollar';
 $string['doubledollar_descr'] = 'Accept block math in double-dollar delimiters.';
+$string['bracket'] = 'Parse bracket';
+$string['bracket_descr'] = 'Accept block math in escaped bracket delimiters.';

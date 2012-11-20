@@ -135,12 +135,12 @@ class filter_mathjax extends moodle_text_filter {
         // and pass to MathJax for processing
 
         $this->patterns = array(
-            '/\\\\\\[.+?\\\\\\]/s',
+            
             '/<math\s[^>]+.+?<\/math>/s',
         );
 
         $this->replacements = array(
-            $precodeblock.'$0'.$postcodeblock,
+            
             $precodeblock.'$0'.$postcodeblock,
         );
 
@@ -151,15 +151,21 @@ class filter_mathjax extends moodle_text_filter {
         }
 
         //   inline: \( ... \)
-        if ($CFG->filter_mathjax_bracket == 1) {
+        if ($CFG->filter_mathjax_parentheses == 1) {
             array_push($this->patterns, '/\\\\\\(.+?\\\\\\)/s');
             array_push($this->replacements, $precodeinline.'$0'.$postcodeinline);
         }
 
-        //   block: $$ ... $$, \[ ... \]
+        //   block: $$ ... $$
         if ($CFG->filter_mathjax_doubledollar == 1) {
             array_push($this->patterns, '/\$\$.+?\$\$/s');
             array_push($this->replacements, $precodeinline.'$0'.$postcodeinline);
+        }
+
+        //   block: \[ ... \]
+        if ($CFG->filter_mathjax_bracket == 1) {
+            array_push($this->patterns, '/\\\\\\[.+?\\\\\\]/s');
+            array_push($this->replacements, $precodeblock.'$0'.$postcodeblock);
         }
     }
     
