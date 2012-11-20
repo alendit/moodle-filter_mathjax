@@ -29,6 +29,8 @@ class filter_mathjax extends moodle_text_filter {
     private $mathjaxpath;
     private $paranoidmode = true;
     private $setupdone = false;
+    private $patterns = array();
+    private $replacements = array();
     
     /**
      * Detect the environment we're working within and set up
@@ -59,7 +61,7 @@ class filter_mathjax extends moodle_text_filter {
             return;
         }
         $this->setupdone = true;
-        
+
         if (file_exists($CFG->dirroot . '/filter/mathjax/js/MathJax.js') &&
             file_exists($CFG->dirroot . '/filter/mathjax/js/config') &&
             file_exists($CFG->dirroot . '/filter/mathjax/js/jax') &&
@@ -112,6 +114,46 @@ class filter_mathjax extends moodle_text_filter {
             debugging('filter_mathjax: page is pre-STATE_BEFORE_HEADER. '.
                     'using paranoid mode.', DEBUG_DEVELOPER);
         }
+
+        // The presence of these indicates MathJax ought to process the block:
+        //   inline: \( ... \)
+        //   block: $$ ... $$, \[ ... \]
+        //   mathml: <math> ... </math>
+
+        if ($this->paranoidmode) {
+            $precodeblock = $precodeinline = $this->get_mathjax_init();
+            $postcodeblock = $postcodeinline = '';
+        } else {
+            $precodeblock = '<div class="filter-mathjax">';
+            $postcodeblock = '</div>';
+            $precodeinline = '<span class="filter-mathjax">';
+            $postcodeinline = '</span>';
+        }
+        
+        // read config and set delimiters
+        // we wrap the MathJax markup we find in inline or block
+        // elements as appropriate for the Javascript module to collect
+        // and pass to MathJax for processing
+
+        $this->patterns = array(
+            '/\\\\\\(.+?\\\\\\)/s',
+            '/\$\$.+?\$\$/s',
+            '/\\\\\\[.+?\\\\\\]/s',
+            '/<math\s[^>]+.+?<\/math>/s',
+        );
+
+        
+        $this->replacements = array(
+            $precodeinline.'$0'.$postcodeinline,
+            $precodeblock.'$0'.$postcodeblock,
+            $precodeblock.'$0'.$postcodeblock,
+            $precodeblock.'$0'.$postcodeblock,
+        );
+
+        if ($CFG->filter_mathjax_singledollar == 1) {
+            array_push($this->patterns, '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s');
+            array_push($this->replacements, $precodeinline.'\( $1 \)'.$postcodeinline);
+        }
     }
     
     /**
@@ -163,45 +205,6 @@ EOT;
     }
     
     public function filter($text, array $options = array()) {
-        global $CFG;
-        // The presence of these indicates MathJax ought to process the block:
-        //   inline: \( ... \)
-        //   block: $$ ... $$, \[ ... \]
-        //   mathml: <math> ... </math>
-
-        if ($this->paranoidmode) {
-            $precodeblock = $precodeinline = $this->get_mathjax_init();
-            $postcodeblock = $postcodeinline = '';
-        } else {
-            $precodeblock = '<div class="filter-mathjax">';
-            $postcodeblock = '</div>';
-            $precodeinline = '<span class="filter-mathjax">';
-            $postcodeinline = '</span>';
-        }
-        
-        // we wrap the MathJax markup we find in inline or block
-        // elements as appropriate for the Javascript module to collect
-        // and pass to MathJax for processing
-        $patterns = array(
-            '/\\\\\\(.+?\\\\\\)/s',
-            '/\$\$.+?\$\$/s',
-            '/\\\\\\[.+?\\\\\\]/s',
-            '/<math\s[^>]+.+?<\/math>/s',
-        );
-
-        
-        $replacements = array(
-            $precodeinline.'$0'.$postcodeinline,
-            $precodeblock.'$0'.$postcodeblock,
-            $precodeblock.'$0'.$postcodeblock,
-            $precodeblock.'$0'.$postcodeblock,
-        );
-        
-        if ($CFG->filter_mathjax_singledollar == 1) {
-            $patterns[] = '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s';
-            $replacements[] = $precodeinline.'\( $1 \)'.$postcodeinline;
-        }
-
-        return preg_replace($patterns, $replacements, $text);
+        return preg_replace($this->patterns, $this->replacements, $text);
     }
 }
