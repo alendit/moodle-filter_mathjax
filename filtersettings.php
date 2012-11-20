@@ -16,5 +16,8 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('filter_mathjax_singledollar',
                        get_string('singledollar', 'filter_mathjax'),
                        get_string('singledollar_descr', 'filter_mathjax'), ''));
+    $settings->add(new admin_setting_configcheckbox('filter_mathjax_doubledollar',
+               get_string('doubledollar', 'filter_mathjax'),
+               get_string('doubledollar_descr', 'filter_mathjax'), 1));
 
 }
