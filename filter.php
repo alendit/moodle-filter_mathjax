@@ -163,6 +163,7 @@ EOT;
     }
     
     public function filter($text, array $options = array()) {
+        global $CFG;
         // The presence of these indicates MathJax ought to process the block:
         //   inline: \( ... \)
         //   block: $$ ... $$, \[ ... \]
@@ -183,20 +184,24 @@ EOT;
         // and pass to MathJax for processing
         $patterns = array(
             '/\\\\\\(.+?\\\\\\)/s',
-            '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s',
             '/\$\$.+?\$\$/s',
             '/\\\\\\[.+?\\\\\\]/s',
             '/<math\s[^>]+.+?<\/math>/s',
         );
+
         
         $replacements = array(
             $precodeinline.'$0'.$postcodeinline,
-            $precodeinline.'\( $1 \)'.$postcodeinline,
             $precodeblock.'$0'.$postcodeblock,
             $precodeblock.'$0'.$postcodeblock,
             $precodeblock.'$0'.$postcodeblock,
         );
         
+        if ($CFG->filter_mathjax_singledollar == 1) {
+            $patterns[] = '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s';
+            $replacements[] = $precodeinline.'\( $1 \)'.$postcodeinline;
+        }
+
         return preg_replace($patterns, $replacements, $text);
     }
 }
