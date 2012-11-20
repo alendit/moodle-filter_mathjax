@@ -116,7 +116,6 @@ class filter_mathjax extends moodle_text_filter {
         }
 
         // The presence of these indicates MathJax ought to process the block:
-        //   inline: \( ... \)
         //   block: $$ ... $$, \[ ... \]
         //   mathml: <math> ... </math>
 
@@ -136,23 +135,28 @@ class filter_mathjax extends moodle_text_filter {
         // and pass to MathJax for processing
 
         $this->patterns = array(
-            '/\\\\\\(.+?\\\\\\)/s',
+            
             '/\$\$.+?\$\$/s',
             '/\\\\\\[.+?\\\\\\]/s',
             '/<math\s[^>]+.+?<\/math>/s',
         );
 
-        
         $this->replacements = array(
-            $precodeinline.'$0'.$postcodeinline,
             $precodeblock.'$0'.$postcodeblock,
             $precodeblock.'$0'.$postcodeblock,
             $precodeblock.'$0'.$postcodeblock,
         );
 
+        //   inline: \$...\$        
         if ($CFG->filter_mathjax_singledollar == 1) {
             array_push($this->patterns, '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s');
             array_push($this->replacements, $precodeinline.'\( $1 \)'.$postcodeinline);
+        }
+
+        //   inline: \( ... \)
+        if ($CFG->filter_mathjax_bracket == 1) {
+            array_push($this->patterns, '/\\\\\\(.+?\\\\\\)/s');
+            array_push($this->replacements, $precodeinline.'$0'.$postcodeinline);
         }
     }
     
