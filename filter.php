@@ -134,6 +134,12 @@ class filter_mathjax extends moodle_text_filter {
         // elements as appropriate for the Javascript module to collect
         // and pass to MathJax for processing
 
+        //   \begin...\end
+        if ($CFG->filter_mathjax_begin_tag == 1) {
+            array_push($this->pattern, '/\\\\begin(.*?)\\\\end/s');
+            array_push($this->replacements, $precodeinline.'$0'.$postcodeinline))
+        }
+
         //   inline: \$...\$        
         if ($CFG->filter_mathjax_singledollar == 1) {
             array_push($this->patterns, '/(?<!\$|\\\\)\$(?!\$)(.+?)(?<!\$|\\\\)\$(?!\$)/s');
