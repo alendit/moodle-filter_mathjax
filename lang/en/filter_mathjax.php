@@ -16,3 +16,5 @@ $string['bracket'] = 'Parse bracket';
 $string['bracket_descr'] = 'Accept block math in escaped bracket delimiters.';
 $string['mathtag'] = 'Parse math element';
 $string['mathtag_descr'] = 'Accept block math in <math /> element.';
+$string['begintag'] = 'Parse \\begin tag';
+$string['begintag_descr'] = 'Parse latex code enclosed in \\begin...\\end tags';
