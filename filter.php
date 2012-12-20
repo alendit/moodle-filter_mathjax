@@ -136,7 +136,7 @@ class filter_mathjax extends moodle_text_filter {
 
         //   \begin...\end
         if ($CFG->filter_mathjax_begintag == 1) {
-            array_push($this->patterns, '/\\\\begin(.*?)\\\\end\\{.*?\\}/s');
+            array_push($this->patterns, '/\\\\begin\\{align[*]?\\}.*?\\\\end\\{align[*]?\\}/s');
             array_push($this->replacements, $precodeblock.'$0'.$postcodeblock);
         }
 
