@@ -91,15 +91,18 @@ class filter_mathjax extends moodle_text_filter {
         }
         
         if ($page->state > moodle_page::STATE_BEFORE_HEADER) {
+	// if (0) {
             // It seems we can use the efficient initialisation path
             $this->paranoidmode = false;
             
             $jsurl = $this->get_mathjax_url(true);
             $mathjaxroot = (string)(new moodle_url($this->mathjaxpath));
             
-            $page->requires->js($jsurl);
-            $page->requires->js_init_call('M.filter_mathjax.init',
-                array('mathjaxroot' => $mathjaxroot));
+	    if (!(isset($CFG->mathjax_paranoid)&&$CFG->mathjax_paranoid)) {
+                $page->requires->js($jsurl);
+                $page->requires->js_init_call('M.filter_mathjax.init',
+                    array('mathjaxroot' => $mathjaxroot));
+	    }
         } else {
             // We need to be paranoid.
             
@@ -113,6 +116,7 @@ class filter_mathjax extends moodle_text_filter {
             
             debugging('filter_mathjax: page is pre-STATE_BEFORE_HEADER. '.
                     'using paranoid mode.', DEBUG_DEVELOPER);
+	    $CFG->mathjax_paranoid = true;
         }
 
         // The presence of these indicates MathJax ought to process the block:
@@ -165,9 +169,8 @@ class filter_mathjax extends moodle_text_filter {
         }
 
         //   block: <math />
-
-        if ($CFG->filter_mathjax_mathtag == 1) {
-            array_push($this->patterns, '/&lt;math(\\s+(?!&gt;).+?&gt;|&gt;).+?&lt;\/math&gt;/s');
+if ($CFG->filter_mathjax_mathtag == 1) { array_push($this->patterns, '/&lt;math(\\s+(?!&gt;).+?&gt;|&gt;).+?&lt;\/math&gt;/s');
+	    // array_push($this->patterns, '<math>(.*?)</math>');
             array_push($this->replacements, $precodeblock.'$0'.$postcodeblock);
         }
     }
@@ -194,7 +197,7 @@ class filter_mathjax extends moodle_text_filter {
      */
     public function get_mathjax_init() {
         $escmathjaxroot = addcslashes((string)(new moodle_url($this->mathjaxpath)), "'");
-        $escmathjaxurl = addcslashes((string)$this->get_mathjax_url(false), "'");
+        $escmathjaxurl = addcslashes((string)$this->get_mathjax_url(true), "'");
         
         $code = <<<EOT
 <script type="text/javascript">
